@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-06
+
 ### Added
 - `mk ui` en Linux vía AT-SPI, sin Python ni GTK. `mk window list` enseña las ventanas nativas de Wayland que AT-SPI expone.
 - `mk check`: comprueba inactividad, ventana activa y control con foco; sale con 1 si algo falla o no se sabe.
