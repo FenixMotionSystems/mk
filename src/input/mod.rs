@@ -4,6 +4,8 @@ pub mod scaling;
 #[cfg(target_os = "linux")]
 pub mod daemon;
 #[cfg(target_os = "linux")]
+mod layout;
+#[cfg(target_os = "linux")]
 mod wtype;
 #[cfg(target_os = "linux")]
 mod xdotool;

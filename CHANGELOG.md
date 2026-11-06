@@ -3,6 +3,11 @@
 ## [Unreleased]
 
 ### Added
+- `mk ui` en Linux vía AT-SPI, sin Python ni GTK. `mk window list` enseña las ventanas nativas de Wayland que AT-SPI expone.
+- `mk check`: comprueba inactividad, ventana activa y control con foco; sale con 1 si algo falla o no se sabe.
+- `mk doctor` informa de la accesibilidad.
+- `mk text` respeta la distribución del teclado en Linux (antes, con teclado español, `/` salía como `-`). El demonio aprende `altgr` y `102nd`, así que hay que reiniciarlo.
+- Con ydotool, `mk key` reconoce las letras: un `_ => None` adelantado las dejaba inalcanzables.
 - `mk mouse-pos` en macOS (nativo) y Linux/X11 (vía `xdotool getmouselocation`); en Wayland error honesto.
 - `mk screenshot --cursor` en macOS y Linux (antes solo Windows; en Linux se arregla además el comando roto `xdotool getcursor`).
 - Protocolo daemon `VERSION` + `mk daemon restart` / versión en `mk daemon status`; `mk doctor` reporta daemon, versión de protocolo y acceso a `/dev/uinput`.

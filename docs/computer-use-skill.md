@@ -5,7 +5,24 @@
 > sobre cómo se usa"*. These are the concrete, learned-the-hard-way rules for
 > driving a desktop through `mk` as an AI agent.
 
-## The core loop (non-negotiable discipline)
+## Prefer the accessibility tree
+
+Act by name first; it is cheaper and more exact than reading images:
+
+```
+mk ui find --name "..."  →  mk ui click / focus / get-value  →  mk ui get-value or mk ui tree
+```
+
+- Confirm results by reading the tree, not by taking a screenshot.
+- Use screenshots when the tree cannot help: apps that draw everything themselves,
+  apps not exposing a tree, or checking how something looks.
+- Keystrokes go to the active window. Before typing unattended, gate it with
+  `mk check --idle ... --active-window ...`, and prefer `mk ui type`, which refuses
+  to type into a window that is not active.
+- `mk doctor` lists the windows exposed. A missing Electron app must be restarted
+  with `ACCESSIBILITY_ENABLED=1 <app> --force-renderer-accessibility`.
+
+## The core loop when you need coordinates (non-negotiable discipline)
 
 ```
 move mouse  →  screenshot  →  READ & validate cursor/target  →  click/adjust  →  screenshot
@@ -83,9 +100,8 @@ the display scale:
    (no cursor in the screenshot to reveal the miss). The lesson: you cannot
    confirm a text field is focused visually before typing; land the focus
    click accurately (post-fix), verify via a screenshot that shows the caret/
-   focus ring, and only then paste. This fragility is the strongest argument
-   for the (currently stubbed) `accessibility` module — targeting a field by
-   role/name beats blind coordinates.
+   focus ring, and only then paste. Targeting the field by name with `mk ui`
+   avoids all of this.
 
 4. **Never click these:** the GNOME-overview per-window close **✗** (top-right
    of the hovered window), and an app's own window-control buttons. In
@@ -113,8 +129,10 @@ the display scale:
 | Screenshot the screen       | ✅            | `mk screenshot` (portal/PipeWire) |
 | Move/click/scroll/type      | ✅            | `mk move/click/scroll/text/paste` (daemon) |
 | Cycle window focus          | ✅ (blind)    | `mk key alt+tab` / `super` + click |
-| List windows + geometry     | ❌            | XCB sees only XWayland; use screenshots |
+| List windows and the active one | ✅ if exposed | `mk window list`, through AT-SPI |
 | Focus a specific window by id | ❌          | not a Wayland operation; use overview/alt-tab |
-| Read UI element tree (a11y) | ❌ (stub)     | `accessibility` module is a stub today |
+| Read UI element tree (a11y) | ✅            | `mk ui tree`, through AT-SPI |
+| Press a control by name     | ✅            | `mk ui click`, window need not be active |
+| Know if it is safe to act   | ✅            | `mk check` |
 
 On Windows/macOS most of the ❌ rows become ✅ — see `docs/window-control.md`.

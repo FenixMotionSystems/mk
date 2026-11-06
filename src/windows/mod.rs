@@ -736,7 +736,29 @@ pub fn list_windows() -> Result<Vec<WindowInfo>> {
             pid: pid_for_window(&w),
         });
     }
+
+    // GNOME on Wayland exposes no window list: AT-SPI is the only view of its
+    // native windows. Not fatal without it, since it may simply not be running.
+    #[cfg(target_os = "linux")]
+    if let Ok(frames) = crate::accessibility::linux_atspi::list_frames() {
+        list = merge_frames(list, frames);
+    }
+
     Ok(list)
+}
+
+/// Add AT-SPI windows to the list. A window seen by both keeps its existing id,
+/// which window operations understand, and takes AT-SPI's word on being active
+/// because xcap cannot tell on Wayland.
+#[cfg(any(target_os = "linux", test))]
+fn merge_frames(mut list: Vec<WindowInfo>, frames: Vec<WindowInfo>) -> Vec<WindowInfo> {
+    for frame in frames {
+        match list.iter_mut().find(|w| w.title == frame.title) {
+            Some(existing) => existing.is_active |= frame.is_active,
+            None => list.push(frame),
+        }
+    }
+    list
 }
 
 /// Poll `list_fn` until a window matches `title` or `timeout` expires.
@@ -1021,6 +1043,29 @@ mod tests {
         assert_eq!(list[1].app_name, "Zenity");
         assert_eq!((list[1].width, list[1].height), (200, 100));
         assert!(parse_sway_tree("{bad").is_err());
+    }
+
+    #[test]
+    fn merge_frames_adds_unseen_windows_and_keeps_known_ids() {
+        let window = |id: &str, title: &str, is_active: bool| WindowInfo {
+            id: id.into(),
+            title: title.into(),
+            app_name: "app".into(),
+            x: 0,
+            y: 0,
+            width: 1,
+            height: 1,
+            is_active,
+            pid: None,
+        };
+        let merged = merge_frames(
+            vec![window("1", "Widgets", false)],
+            vec![window("atspi:a", "Widgets", true), window("atspi:b", "IDE", false)],
+        );
+        assert_eq!(merged.len(), 2);
+        assert_eq!(merged[0].id, "1", "a known window keeps the id window ops understand");
+        assert!(merged[0].is_active, "AT-SPI's active state wins over xcap's blind false");
+        assert_eq!(merged[1].id, "atspi:b");
     }
 
     #[test]
