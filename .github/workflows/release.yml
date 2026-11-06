@@ -38,7 +38,8 @@ jobs:
       - name: Package
         shell: bash
         run: |
-          name="mk-${GITHUB_REF_NAME}-${{ matrix.target }}"
+          # A dry run can come from a branch, whose name may contain slashes.
+          name="mk-${GITHUB_REF_NAME//\//-}-${{ matrix.target }}"
           mkdir "$name"
           for bin in ${{ matrix.bins }}; do cp "target/${{ matrix.target }}/release/$bin" "$name/"; done
           cp LICENSE README.md "$name/"
