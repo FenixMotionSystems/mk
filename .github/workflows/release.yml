@@ -49,7 +49,11 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: mk-${{ matrix.target }}
-          path: mk-*.*
+          # Not `mk-*.*`: the staging folder's name has dots when the version does.
+          path: |
+            mk-*.tar.gz
+            mk-*.zip
+            mk-*.sha256
 
   publish:
     needs: build
