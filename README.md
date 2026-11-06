@@ -172,6 +172,48 @@ mk paste "texto largo" --focus 2230160  # --focus en TODOS los comandos de input
 > invocación** (o usa `mk ui`, que no necesita foco). Sin eso, el foco puede
 > revertir entre llamadas y la acción aterriza en otra ventana.
 
+### `mk ui` en Linux (vía AT-SPI, sin Python ni GTK)
+
+Mismas órdenes y mismo JSON que en Windows. Pulsar un control funciona aunque
+su ventana no sea la activa. `mk window list` también enseña las ventanas nativas
+de Wayland que AT-SPI expone, con su id `atspi:...`.
+
+- **Apps Electron/Chromium (VS Code y derivados):** solo aparecen si arrancan con
+  `ACCESSIBILITY_ENABLED=1 <app> --force-renderer-accessibility`. `mk doctor`
+  lista lo que se ve. VS Code puede pasar entonces a su modo para lectores de
+  pantalla.
+- **`mk ui type` se niega a escribir** si la ventana del control no es la activa:
+  las teclas siempre van a la ventana activa, y en Wayland no se puede activar una
+  ventana cualquiera desde fuera.
+- **`mk ui set-value`** depende de la app: si no lo admite, usa `mk ui type --clipboard`.
+- **No disponibles:** `double-click`, `drag` y `shot`. En Wayland, `x`/`y` de un
+  elemento son relativos a su ventana: actúa por nombre, no por esos números.
+
+### `mk check`: ¿es seguro actuar?
+
+Imprime JSON y sale con código 1 si una condición falla o el sistema no puede
+responderla, así que se encadena con `&&`. Una respuesta desconocida nunca cuenta
+como «adelante».
+
+| Condición | Significa |
+|-----------|-----------|
+| `--idle 30m` | Sin tocar teclado ni ratón ese tiempo (por ahora, solo GNOME) |
+| `--active-window "Code"` | El título de la ventana activa contiene ese texto |
+| `--focused "Message input"` | El control con el foco contiene ese nombre (por ahora, solo Linux) |
+
+```bash
+# Compactar Claude Code de noche, solo si nadie está usando el PC
+mk wait 50m && mk check --idle 30m --active-window "Visual Studio Code" \
+  && mk ui type --name "Message input" --text "/compact" --clipboard \
+  && mk ui click --name "Send message"
+```
+
+### Teclado en `mk text` (Linux)
+
+`mk text` respeta la distribución activa: con teclado español, `/` se envía como
+`shift+7`. Un carácter que necesita tecla muerta (`á`) da error sin escribir nada:
+usa `mk paste`. Tras actualizar, reinicia el demonio (`mk daemon restart`).
+
 ### `mk ui` en macOS (vía System Events, sin dependencias nuevas)
 
 Mismos subcomandos; el árbol AX se vuelca con un `osascript` y los clics van

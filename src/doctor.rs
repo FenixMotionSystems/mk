@@ -30,6 +30,8 @@ pub fn run() -> Result<()> {
         println!("  System UTC Time:   {}", chrono::Utc::now());
 
 
+        print_accessibility();
+
         println!("\nKeyboard backends:");
         check_tool("wtype");
         check_tool("xdotool");
@@ -188,6 +190,25 @@ fn print_window_control() {
             println!("  enumerated {n} window(s)");
         }
     }
+}
+
+#[cfg(target_os = "linux")]
+fn print_accessibility() {
+    println!("\nAccessibility (mk ui):");
+    match crate::accessibility::linux_atspi::list_frames() {
+        Ok(frames) => {
+            println!("  [✓] AT-SPI responds, {} window(s) exposed", frames.len());
+            for frame in frames {
+                let active = if frame.is_active { " (active)" } else { "" };
+                println!("      {}: {}{active}", frame.app_name, frame.title);
+            }
+        }
+        Err(error) => println!("  [✗] AT-SPI: {error:#}"),
+    }
+    println!(
+        "  An app missing here cannot be read by name. Electron/Chromium apps must start with:\n    \
+         ACCESSIBILITY_ENABLED=1 <app> --force-renderer-accessibility"
+    );
 }
 
 #[cfg(target_os = "linux")]

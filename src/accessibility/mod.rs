@@ -83,7 +83,7 @@ pub(crate) fn shot_element(
 
 /// Shared wait loop: poll `find` until it yields an element (and, with
 /// `require_visible`, one that is enabled and on-screen) or `timeout`.
-#[cfg(any(target_os = "windows", target_os = "macos"))]
+#[cfg(any(target_os = "windows", target_os = "macos", target_os = "linux"))]
 pub(crate) fn wait_for_element(
     query: &str,
     window_id: &str,
@@ -170,22 +170,32 @@ pub use macos_ax::{
     ui_type, ui_wait,
 };
 
-#[cfg(not(any(target_os = "windows", target_os = "macos")))]
+#[cfg(target_os = "linux")]
+pub mod linux_atspi;
+
+#[cfg(target_os = "linux")]
+pub use linux_atspi::{
+    ui_click, ui_double_click, ui_drag, ui_expand, ui_find, ui_focus, ui_get_value,
+    ui_right_click, ui_set_value, ui_shot, ui_show_menu, ui_toggle, ui_tree_for_window,
+    ui_type, ui_wait,
+};
+
+#[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
 pub fn ui_tree_for_window(_window_id: &str) -> Result<Vec<UiElement>> {
     Ok(Vec::new())
 }
 
-#[cfg(not(any(target_os = "windows", target_os = "macos")))]
+#[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
 pub fn ui_click(_window_id: &str, _query: &str, _mode: &MatchMode) -> Result<UiElement> {
     anyhow::bail!("UI Automation solo disponible en Windows")
 }
 
-#[cfg(not(any(target_os = "windows", target_os = "macos")))]
+#[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
 pub fn ui_toggle(_window_id: &str, _query: &str, _mode: &MatchMode) -> Result<UiElement> {
     anyhow::bail!("UI Automation solo disponible en Windows")
 }
 
-#[cfg(not(any(target_os = "windows", target_os = "macos")))]
+#[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
 pub fn ui_set_value(
     _window_id: &str,
     _query: &str,
@@ -195,27 +205,27 @@ pub fn ui_set_value(
     anyhow::bail!("UI Automation solo disponible en Windows")
 }
 
-#[cfg(not(any(target_os = "windows", target_os = "macos")))]
+#[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
 pub fn ui_double_click(_window_id: &str, _query: &str, _mode: &MatchMode) -> Result<UiElement> {
     anyhow::bail!("UI Automation solo disponible en Windows")
 }
 
-#[cfg(not(any(target_os = "windows", target_os = "macos")))]
+#[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
 pub fn ui_right_click(_window_id: &str, _query: &str, _mode: &MatchMode) -> Result<UiElement> {
     anyhow::bail!("UI Automation solo disponible en Windows")
 }
 
-#[cfg(not(any(target_os = "windows", target_os = "macos")))]
+#[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
 pub fn ui_focus(_window_id: &str, _query: &str, _mode: &MatchMode) -> Result<UiElement> {
     anyhow::bail!("UI Automation solo disponible en Windows")
 }
 
-#[cfg(not(any(target_os = "windows", target_os = "macos")))]
+#[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
 pub fn ui_get_value(_window_id: &str, _query: &str, _mode: &MatchMode) -> Result<UiState> {
     anyhow::bail!("UI Automation solo disponible en Windows")
 }
 
-#[cfg(not(any(target_os = "windows", target_os = "macos")))]
+#[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
 pub fn ui_expand(
     _window_id: &str,
     _query: &str,
@@ -225,7 +235,7 @@ pub fn ui_expand(
     anyhow::bail!("UI Automation solo disponible en Windows")
 }
 
-#[cfg(not(any(target_os = "windows", target_os = "macos")))]
+#[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
 pub fn ui_wait(
     _window_id: &str,
     _query: &str,
@@ -237,7 +247,7 @@ pub fn ui_wait(
     anyhow::bail!("UI Automation solo disponible en Windows")
 }
 
-#[cfg(not(any(target_os = "windows", target_os = "macos")))]
+#[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
 pub fn ui_shot(
     _window_id: &str,
     _query: &str,
@@ -249,12 +259,12 @@ pub fn ui_shot(
     anyhow::bail!("UI Automation solo disponible en Windows")
 }
 
-#[cfg(not(any(target_os = "windows", target_os = "macos")))]
+#[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
 pub fn ui_find(_query: &str, _mode: &MatchMode) -> Result<Vec<UiHit>> {
     anyhow::bail!("UI Automation solo disponible en Windows")
 }
 
-#[cfg(not(any(target_os = "windows", target_os = "macos")))]
+#[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
 pub fn ui_type(
     _window_id: &str,
     _query: &str,
@@ -265,12 +275,12 @@ pub fn ui_type(
     anyhow::bail!("UI Automation solo disponible en Windows")
 }
 
-#[cfg(not(any(target_os = "windows", target_os = "macos")))]
+#[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
 pub fn ui_show_menu(_window_id: &str, _query: &str, _mode: &MatchMode) -> Result<UiElement> {
     anyhow::bail!("UI Automation solo disponible en Windows")
 }
 
-#[cfg(not(any(target_os = "windows", target_os = "macos")))]
+#[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
 pub fn ui_drag(
     _window_id: &str,
     _from: &str,

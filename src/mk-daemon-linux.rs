@@ -63,6 +63,8 @@ const KEY_LEFT: u16 = 105;
 const KEY_RIGHT: u16 = 106;
 const KEY_LEFTCTRL: u16 = 29;
 const KEY_LEFTALT: u16 = 56;
+const KEY_RIGHTALT: u16 = 100;
+const KEY_102ND: u16 = 86;
 const KEY_LEFTSHIFT: u16 = 42;
 const KEY_LEFTMETA: u16 = 125;
 const KEY_F1: u16 = 59;
@@ -287,6 +289,7 @@ fn keyname_to_keycode(name: &str) -> Option<u16> {
         "," | "comma" => Some(KEY_COMMA),
         "." | "dot" => Some(KEY_DOT),
         "/" | "slash" => Some(KEY_SLASH),
+        "102nd" => Some(KEY_102ND),
         _ => None,
     }
 }
@@ -295,6 +298,7 @@ fn modifier_to_keycode(name: &str) -> Option<u16> {
     match name.to_lowercase().as_str() {
         "ctrl" | "control" => Some(KEY_LEFTCTRL),
         "alt" | "meta" => Some(KEY_LEFTALT),
+        "altgr" => Some(KEY_RIGHTALT),
         "shift" => Some(KEY_LEFTSHIFT),
         "super" | "win" | "logo" => Some(KEY_LEFTMETA),
         _ => None,
@@ -342,6 +346,7 @@ impl UinputDevice {
                 KEY_I, KEY_J, KEY_K, KEY_L, KEY_M, KEY_N, KEY_O, KEY_P,
                 KEY_Q, KEY_R, KEY_S, KEY_T, KEY_U, KEY_V, KEY_W, KEY_X,
                 KEY_Y, KEY_Z, KEY_0, KEY_1, KEY_2, KEY_3, KEY_4, KEY_5,
+                KEY_RIGHTALT, KEY_102ND,
                 KEY_6, KEY_7, KEY_8, KEY_9, KEY_ENTER, KEY_ESC, KEY_BACKSPACE,
                 KEY_TAB, KEY_SPACE, KEY_DELETE, KEY_UP, KEY_DOWN, KEY_LEFT,
                 KEY_RIGHT, KEY_LEFTCTRL, KEY_LEFTALT, KEY_LEFTSHIFT, KEY_LEFTMETA,

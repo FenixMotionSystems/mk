@@ -49,6 +49,12 @@ pub struct DaemonBackend;
 
 impl Backend for DaemonBackend {
     fn type_text(&self, text: &str) -> Result<()> {
+        if let Some(strokes) = super::layout::plan(text)? {
+            for stroke in &strokes {
+                self.press_key(stroke)?;
+            }
+            return Ok(());
+        }
         let mut stream = connect()?;
         // Escape backslashes and newlines: the protocol uses \n as message
         // delimiter, so embedded newlines must be sent as the two-char sequence \n.

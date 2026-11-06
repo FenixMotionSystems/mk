@@ -146,11 +146,9 @@ so an agent can plan instead of trial-and-error.
 - **Phase 5 (IN PROGRESS):** accessibility tree. Windows UIA done
   (`mk ui`, 13 subcommands). macOS partial: System Events dump
   (`src/accessibility/macos_ax.rs`, no new deps) wires tree/click/focus/
-  wait/shot; value/expand/global-find bail honestly. Linux AT-SPI
-  **deferred on purpose**: it needs an async runtime (zbus/tokio) plus a
-  registry tree-walk nobody can validate without a Linux GUI here — a blind
-  implementation would look working while misplacing clicks. Revisit with a
-  Linux desktop to test against (candidate: `atspi` crate).
+  wait/shot; value/expand/global-find bail honestly. Linux AT-SPI done over
+  blocking zbus (`src/accessibility/linux_atspi.rs`) and validated on
+  GNOME/Wayland against VS Code; only double-click, drag and shot bail.
   **Field evidence (2026-07-20, Windows, see `docs/windows-computer-use-notes.md`):**
   raw coordinate control (`mk move`/`click`/`scroll`) worked correctly once
   window offset + focus were handled right, but named-element clicks via

@@ -1,6 +1,6 @@
 [package]
 name = "mk"
-version = "0.6.0"
+version = "0.7.0"
 edition = "2024"
 description = "CLI to automate keyboard input on Linux, Windows and macOS"
 license = "MIT"
@@ -29,6 +29,10 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 regex = "1"
 
+
+[target.'cfg(target_os = "linux")'.dependencies]
+zbus = "5"
+xkbcommon-dl = "0.4"
 
 [target.'cfg(target_os = "windows")'.dependencies]
 uiautomation = { version = "0.25.1", features = ["clipboard"] }

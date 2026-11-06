@@ -228,6 +228,18 @@ enum Commands {
     },
     /// Check system dependencies and display diagnostics
     Doctor,
+    /// Is it safe to act? Prints JSON, exits 1 if any condition fails or is unknown
+    Check {
+        /// Minimum time since the last keyboard or mouse input: "30m", "90s"
+        #[arg(long)]
+        idle: Option<String>,
+        /// The active window's title must contain this (case-insensitive)
+        #[arg(long)]
+        active_window: Option<String>,
+        /// The focused control's name must contain this (case-insensitive)
+        #[arg(long)]
+        focused: Option<String>,
+    },
     /// List, inspect, or focus on-screen windows
     Window {
         #[command(subcommand)]
@@ -705,6 +717,15 @@ fn real_main() -> Result<()> {
         Commands::Doctor => {
             return doctor::run();
         }
+        Commands::Check { idle, active_window, focused } => {
+            let min_idle = idle.as_deref().map(parser::parse_duration).transpose()?;
+            let report = mk::check::run(&mk::check::CheckRequest { min_idle, active_window, focused });
+            println!("{}", serde_json::to_string_pretty(&report)?);
+            if !report.ok {
+                std::process::exit(1);
+            }
+            return Ok(());
+        }
         Commands::Window { action } => {
             return handle_window(action);
         }
@@ -995,7 +1016,7 @@ fn real_main() -> Result<()> {
                 println!("{}", serde_json::json!({"path": input, "width": img.width(), "height": img.height()}));
             }
         },
-        Commands::Daemon { .. } | Commands::Doctor | Commands::Window { .. } | Commands::Ui { .. } => unreachable!(),
+        Commands::Daemon { .. } | Commands::Doctor | Commands::Check { .. } | Commands::Window { .. } | Commands::Ui { .. } => unreachable!(),
     }
 
     Ok(())

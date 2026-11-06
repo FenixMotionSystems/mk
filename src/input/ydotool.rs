@@ -6,6 +6,12 @@ pub struct YdotoolBackend;
 
 impl Backend for YdotoolBackend {
     fn type_text(&self, text: &str) -> Result<()> {
+        if let Some(strokes) = super::layout::plan(text)? {
+            for stroke in &strokes {
+                self.press_key(stroke)?;
+            }
+            return Ok(());
+        }
         let status = Command::new("ydotool")
             .args(["type", "--", text])
             .status()
@@ -42,7 +48,7 @@ impl Backend for YdotoolBackend {
 fn is_modifier(key: &str) -> bool {
     matches!(
         key.to_lowercase().as_str(),
-        "ctrl" | "control" | "alt" | "shift" | "super" | "win" | "meta"
+        "ctrl" | "control" | "alt" | "altgr" | "shift" | "super" | "win" | "meta"
     )
 }
 
@@ -50,6 +56,7 @@ fn resolve_modifier_code(key: &str) -> Option<&'static str> {
     match key.to_lowercase().as_str() {
         "ctrl" | "control" => Some("29"),
         "alt" | "meta" => Some("56"),
+        "altgr" => Some("100"),
         "shift" => Some("42"),
         "super" | "win" | "logo" => Some("125"),
         _ => None,
@@ -104,7 +111,7 @@ fn resolve_key_code_str(key: &str) -> Option<&'static str> {
         "," | "comma" => Some("51"),
         "." | "dot" | "period" => Some("52"),
         "/" | "slash" => Some("53"),
-        _ => None,
+        "102nd" => Some("86"),
         // letters
         "a" => Some("30"),
         "b" => Some("48"),
